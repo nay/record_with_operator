@@ -22,6 +22,10 @@ class NoteWithUser < ActiveRecord::Base
   end
 end
 
+class SimpleNoteWithUser < ActiveRecord::Base
+  set_table_name "simple_notes"
+end
+
 class MemoWithUser < ActiveRecord::Base
   set_table_name "memos"
 
@@ -53,7 +57,7 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   end
 
   def test_simple_note_should_not_be_respond_to_creator
-    assert_equal false, SimpleNote.new.respond_to?(:creator)
+    assert_equal false, SimpleNoteWithUser.new.respond_to?(:creator)
   end
 
   def test_note_should_be_respond_to_updater
@@ -61,7 +65,7 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   end
 
   def test_simple_note_should_not_be_respond_to_updater
-    assert_equal false, SimpleNote.new.respond_to?(:updater)
+    assert_equal false, SimpleNoteWithUser.new.respond_to?(:updater)
   end
 
   def test_note_should_be_respond_to_deleter
@@ -69,7 +73,7 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   end
 
   def test_simple_note_should_not_be_respond_to_deleter
-    assert_equal false, SimpleNote.new.respond_to?(:deleter)
+    assert_equal false, SimpleNoteWithUser.new.respond_to?(:deleter)
   end
 
   # test updater without creater, deleter
