@@ -7,7 +7,7 @@ Also it makes creator, updater, deleter association (belongs_to) if the class ha
 
 You need to set 'operator' (it may be an User object) to your model object at first.
 Once you have set an operator, it will be copied to objects in the association collection, so it might be enough to set an operator per request.
-Operators are also useful for your access control features on model's side, too.
+Operators are also useful for your access control features on model's side.
 To set operator, simply use operator= or get objects by find method with :for option.
 
 The logical deletion function itself is out of this plugin's scope.
