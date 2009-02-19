@@ -7,6 +7,8 @@ class NoteWithUser < ActiveRecord::Base
   set_table_name "notes"
   has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id"
 
+  named_scope :new_arrivals, {:order => "updated_at desc"}
+
   def destroy_with_deleted_at
     NoteWithUser.update_all("deleted_at = '#{Time.now.to_s(:db)}'", "id = #{self.id}")
   end
@@ -22,6 +24,8 @@ end
 
 class MemoWithUser < ActiveRecord::Base
   set_table_name "memos"
+
+  named_scope :new_arrivals, {:order => "updated_at desc"}
 end
 
 class UpdaterNoteWithUser < ActiveRecord::Base
@@ -90,6 +94,17 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert DeleterNoteWithUser.new.respond_to?(:deleter)
   end
 
+  # find with :for
+  def test_note_should_be_found_with_for
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal(@user2, note.operator)
+  end
+
+  def test_note_should_be_found_with_for_through_named_scope
+    note = NoteWithUser.new_arrivals.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal(@user2, note.operator)
+  end
+
   # save or destory with xxxx_by and can get as a creator/updator/deleter
 
   def test_note_should_be_created_with_operator
@@ -104,11 +119,6 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert_equal @user1.id, @note_created_by_user1.updated_by
     assert_equal @user1, @note_created_by_user1.creator
     assert_equal @user1, @note_created_by_user1.updater
-  end
-
-  def test_note_should_be_found_with_for
-    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
-    assert_equal(@user2, note.operator)
   end
 
   def test_note_should_be_updated_with_updated_by
@@ -128,6 +138,13 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert @user2.id, note.deleted_by
   end
 
+  # reload
+  def test_reload_should_not_change_operator
+    @note_created_by_user1.reload
+    assert_equal @user1, @note_created_by_user1.operator
+  end
+  
+
   # has_many Association Test
   def test_builded_memo_should_have_operator
     note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
@@ -142,5 +159,44 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert_equal @user2, memo.operator
     assert_equal @user2.id, memo.created_by
   end
+
+  def test_auto_found_memo_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert_equal @user2, note.memos(true).first.operator
+  end
+
+  def test_manualy_found_memo_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert_equal @user2, note.memos.find(:first).operator
+  end
+
+  def test_dynamically_found_memo_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert_equal @user2, note.memos.find_by_body("memo").operator
+  end
+
+  def test_dynamically_found_memos_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert note.memos.find_all_by_body("memo").all?{|m| m.operator == @user2}
+  end
+
+
+  def test_found_memo_through_named_scope_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert_equal @user2, note.memos.new_arrivals.first.operator
+  end
+
+
+  def test_dynamically_found_memo_through_named_scope_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    note.memos.create!(:body => "memo")
+    assert_equal @user2, note.memos.new_arrivals.find_by_body("memo").operator
+  end
+
 
 end
