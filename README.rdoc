@@ -1,0 +1,46 @@
+= RecordWithOperator
+
+== Introduction
+
+RecordWithOperator is a rails plugin that makes your all active record models to be saved or logically deleted with created_by, updated_by, deleted_by automatically.
+Also it makes creator, updater, deleter association (belongs_to) if the class has created_by, updated_by, deleted_by.
+
+You need to set 'operator' (it may be an User object) to your model object at first.
+Once you have set an operator, it will be copied to objects in the association collection, so it might be enough to set an operator per request.
+Operators are also useful for your access control features on model's side, too.
+To set operator, simply use operator= or get objects by find method with :for option.
+
+The logical deletion function itself is out of this plugin's scope.
+This plugin assumes that the logical deletion is kicked by record.destory.
+
+== Example
+
+Create a new note object with current_user:
+
+ note = Note.create(:body => "This is my first note.", :operator => current_user)
+ # note.operator will be current_user
+ # note.created_by will be current_user.id
+
+Get note objects with current_user:
+
+ notes = Note.find(:all, :for => current_user)
+ # notes.first.operator will be current_user
+ # notes.find_by_body("This is my first note.").operator will be current_user
+
+Create note's comments:
+
+ note = Note.find(params[:id], :for => current_user)
+ note.comments.create!(:body => params[:comment_body])
+ # comment's operator will be automatically set and used as created_by
+
+== Configuration
+
+You can change the operator's class name by setting RecordWithOperator.config[:user_class_name].
+The default is 'User'.
+Note that it is required to change the value before the model's creator/updater/deleter is firstly called.
+For example, you can write the code under config/initializers.
+
+  RecordWithOperator.config[:user_class_name] = "AdminUser"
+
+
+Copyright (c) 2009 Yasuko Ohba, released under the MIT license
