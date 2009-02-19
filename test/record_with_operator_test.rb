@@ -5,6 +5,7 @@ end
 
 class NoteWithUser < ActiveRecord::Base
   set_table_name "notes"
+  has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id"
 
   def destroy_with_deleted_at
     NoteWithUser.update_all("deleted_at = '#{Time.now.to_s(:db)}'", "id = #{self.id}")
@@ -17,6 +18,20 @@ class NoteWithUser < ActiveRecord::Base
   def deleted?
     self.deleted_at <= Time.now
   end
+end
+
+class MemoWithUser < ActiveRecord::Base
+  set_table_name "memos"
+end
+
+class UpdaterNoteWithUser < ActiveRecord::Base
+  set_table_name "updater_notes"
+
+end
+
+class DeleterNoteWithUser < ActiveRecord::Base
+  set_table_name "deleter_notes"
+
 end
 
 class RecordWithOperatorTest < ActiveSupport::TestCase
@@ -51,6 +66,28 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
 
   def test_simple_note_should_not_be_respond_to_deleter
     assert_equal false, SimpleNote.new.respond_to?(:deleter)
+  end
+
+  # test updater without creater, deleter
+  def test_updater_note_should_not_be_respond_to_creater
+    assert_equal false, UpdaterNoteWithUser.new.respond_to?(:creater)
+  end
+  def test_updater_note_should_be_respond_to_updater
+    assert UpdaterNoteWithUser.new.respond_to? :updater
+  end
+  def test_updater_note_should_not_be_respond_to_deleter
+    assert_equal false, UpdaterNoteWithUser.new.respond_to?(:deleter)
+  end
+
+  # test deleter without create, updater
+  def test_deleter_note_should_not_be_respond_to_creater
+    assert_equal false, DeleterNoteWithUser.new.respond_to?(:creater)
+  end
+  def test_deleter_note_should_not_be_respond_to_updater
+    assert_equal false, DeleterNoteWithUser.new.respond_to?(:updater)
+  end
+  def test_deleter_note_should_be_respond_to_deleter
+    assert DeleterNoteWithUser.new.respond_to?(:deleter)
   end
 
   # save or destory with xxxx_by and can get as a creator/updator/deleter
@@ -89,6 +126,21 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     note.reload
     raise "not deleted" unless note.deleted?
     assert @user2.id, note.deleted_by
+  end
+
+  # has_many Association Test
+  def test_builded_memo_should_have_operator
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    memo = note.memos.build(:body => "memo")
+    assert_equal @user2, memo.operator
+  end
+
+  def test_created_memo_should_have_operator_and_created_by
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    memo = note.memos.create(:body => "memo")
+    assert_equal false, memo.new_record?
+    assert_equal @user2, memo.operator
+    assert_equal @user2.id, memo.created_by
   end
 
 end

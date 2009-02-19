@@ -17,12 +17,12 @@ module RecordWithOperator
         else
           options[:extend] = AssociationWithOperator
         end
-        # add :set_operator to :after_add
-        if options[:after_add]
-          options[:after_add] = [options[:after_add]] unless options[:after_add].kind_of? Array
-          options[:after_add] << :set_operator
+        # add :set_operator to :before_add
+        if options[:before_add]
+          options[:before_add] = [options[:before_add]] unless options[:before_add].kind_of? Array
+          options[:before_add] << :set_operator
         else
-          options[:after_add] = :set_operator
+          options[:before_add] = :set_operator
         end
         args << options
         has_many_without_operator(*args, &extension)
