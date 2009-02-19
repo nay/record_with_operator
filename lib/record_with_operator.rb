@@ -10,11 +10,19 @@ module RecordWithOperator
     class << base
       def has_many_with_operator(*args, &extension)
         options = args.extract_options!
+        # add AssociationWithOprator to :extend
         if options[:extend]
           options[:extend] = [options[:extend]] unless options[:extend].kind_of? Array
           options[:extend] << AssociationWithOperator
         else
           options[:extend] = AssociationWithOperator
+        end
+        # add :set_operator to :after_add
+        if options[:after_add]
+          options[:after_add] = [options[:after_add]] unless options[:after_add].kind_of? Array
+          options[:after_add] << :set_operator
+        else
+          options[:after_add] = :set_operator
         end
         args << options
         has_many_without_operator(*args, &extension)
@@ -53,9 +61,6 @@ module RecordWithOperator
     base.before_save :set_updated_by
     base.before_destroy :set_updated_by if config[:record_deleter]
 
-#    base.belongs_to :creator, :foreign_key => "created_by", :class_name => config[:user_class_name]
-#    base.belongs_to :updater, :foreign_key => "updated_by", :class_name => config[:user_class_name]
-#    base.belongs_to :deleter, :foreign_key => "deleted_by", :class_name => config[:user_class_name] if @config[:record_deleter]
   end
 
   def respond_to?(name, priv=false)
@@ -72,6 +77,10 @@ module RecordWithOperator
   end
 
   private
+  def set_operator(child)
+    child.operator = self.operator
+  end
+
   def method_missing(method, *args)
     return super unless respond_to?(method)
     case method.to_sym

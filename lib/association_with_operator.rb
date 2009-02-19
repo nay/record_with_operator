@@ -21,14 +21,4 @@ module AssociationWithOperator
     results
   end
 
-  private
-  def build_record(attrs)
-    object = super
-    object.operator = proxy_owner.operator if object.respond_to? :operator=
-    object
-  end
-  def create_record(attrs)
-    super attrs.merge({:operator => proxy_owner.operator}) # TODO:
-  end
-
 end
