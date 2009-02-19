@@ -1,6 +1,6 @@
 module RecordWithOperator
   def self.config
-    @config ||= {:user_class_name => "User", :record_deleter => true}
+    @config ||= {:user_class_name => "User"}
     @config
   end
 
@@ -59,7 +59,7 @@ module RecordWithOperator
 
     base.before_create :set_created_by
     base.before_save :set_updated_by
-    base.before_destroy :set_updated_by if config[:record_deleter]
+    base.before_destroy :set_deleted_at
 
   end
 
@@ -68,9 +68,9 @@ module RecordWithOperator
     when :creator
       respond_to? :created_by
     when :updater
-      respond_to? :created_by
+      respond_to? :updated_by
     when :deleter
-      respond_to? :created_by
+      respond_to? :deleted_by
     else
       super
     end
