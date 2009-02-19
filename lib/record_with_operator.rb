@@ -59,7 +59,7 @@ module RecordWithOperator
 
     base.before_create :set_created_by
     base.before_save :set_updated_by
-    base.before_destroy :set_deleted_at
+    base.before_destroy :set_deleted_by
 
   end
 
