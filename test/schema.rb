@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(:version => 1) do
   end
 
   create_table :notes, :force => true do |t|
+    t.column :memo_id, :integer
     t.column :body, :text
     t.column :created_by, :integer
     t.column :created_at, :datetime

@@ -55,6 +55,37 @@ module RecordWithOperator
       end
 
       alias_method_chain :validate_find_options, :for
+
+      private
+        # define_method association, association= ...
+        def association_accessor_methods_with_operator(reflection, association_proxy_class)
+          association_accessor_methods_without_operator(reflection, association_proxy_class)
+          define_method("#{reflection.name}_with_operator") do |*params|
+            r = send("#{reflection.name}_without_operator", *params)
+            r.operator ||= self.operator if r && r.respond_to?(:operator=)
+            r
+          end
+          alias_method_chain "#{reflection.name}".to_sym, :operator
+
+          define_method("#{reflection.name}_with_operator=") do |new_value|
+            new_value.operator ||= self.operator if new_value.respond_to?(:operator=)
+            send("#{reflection.name}_without_operator=", new_value)
+          end
+          alias_method_chain "#{reflection.name}=".to_sym, :operator
+        end
+        alias_method_chain :association_accessor_methods, :operator
+
+        # define_method build_association, create_association ...
+        def association_constructor_method_with_operator(constructor, reflection, association_proxy_class)
+          association_constructor_method_without_operator(constructor, reflection, association_proxy_class)
+          define_method("#{constructor}_#{reflection.name}_with_operator") do |*params|
+            options = { :operator => self.operator }
+            params.empty? ? params[0] = options : params.first.merge!(options)
+            self.send("#{constructor}_#{reflection.name}_without_operator", *params)
+          end
+          alias_method_chain "#{constructor}_#{reflection.name}".to_sym, :operator
+        end
+        alias_method_chain :association_constructor_method, :operator
     end
 
     base.before_create :set_created_by
