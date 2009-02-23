@@ -167,6 +167,13 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert_equal @user2, memo.operator
   end
 
+  def test_builded_memo_should_have_own_set_operator
+    note = NoteWithUser.find(@note_created_by_user1.id)
+    memo = note.memos.build(:body => "memo", :operator => @user2)
+    assert_equal @user2, memo.operator
+  end
+
+
   def test_created_memo_should_have_operator_and_created_by
     note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
     memo = note.memos.create(:body => "memo")

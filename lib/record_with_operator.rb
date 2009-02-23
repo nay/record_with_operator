@@ -109,7 +109,7 @@ module RecordWithOperator
 
   private
   def set_operator(child)
-    child.operator = self.operator
+    child.operator ||= self.operator
   end
 
   def method_missing(method, *args)
