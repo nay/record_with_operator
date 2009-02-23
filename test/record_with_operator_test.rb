@@ -9,16 +9,25 @@ class NoteWithUser < ActiveRecord::Base
 
   named_scope :new_arrivals, {:order => "updated_at desc"}
 
-  def destroy_with_deleted_at
-    NoteWithUser.update_all("deleted_at = '#{Time.now.to_s(:db)}'", "id = #{self.id}")
+  def destroy_without_callbacks
+    unless new_record?
+      self.class.update_all self.class.send(:sanitize_sql, ["deleted_at = ?", (self.deleted_at = default_timezone == :utc ? Time.now.utc : Time.now)]), ["#{self.class.primary_key} = ?", id]
+    end
+    freeze
   end
-  alias_method_chain :destroy, :deleted_at
-  def destory!
-    destory_without_deleted_at
+
+  def destroy_with_callbacks!
+    return false if callback(:before_destroy) == false
+    result = destroy_without_callbacks!
+    callback(:after_destroy)
+    result
+  end
+  def destroy!
+    transaction { destroy_with_callbacks! }
   end
 
   def deleted?
-    self.deleted_at <= Time.now
+    self.deleted_at.to_time <= Time.now
   end
 end
 
@@ -46,7 +55,9 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   def setup
     RecordWithOperator.config[:user_class_name] = "User"
     @user1 = User.create!(:name => "user1")
+    raise "@user1.id is nil" unless @user1.id
     @user2 = User.create!(:name => "user2")
+    raise "@user2.id is nil" unless @user2.id
     @note_created_by_user1 = NoteWithUser.create!(:body => "test", :operator => @user1)
   end
 
@@ -137,9 +148,9 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   def test_note_should_be_destroyed_with_deleted_by
     note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
     note.destroy # logically
-    note.reload
+    note = NoteWithUser.find(@note_created_by_user1.id)
     raise "not deleted" unless note.deleted?
-    assert @user2.id, note.deleted_by
+    assert_equal @user2.id, note.deleted_by
   end
 
   # reload

@@ -141,7 +141,8 @@ module RecordWithOperator
 
   def set_deleted_by
     return unless respond_to?(:deleted_by=) && operator
-    self.updated_by = operator.id
+    self.deleted_by = operator.id
+    save!
   end
 
 end
