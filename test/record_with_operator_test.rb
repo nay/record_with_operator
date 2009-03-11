@@ -62,7 +62,6 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   end
 
   # creator/updater/deleter association operation
-
   def test_note_should_be_respond_to_creator
     assert NoteWithUser.new.respond_to? :creator
   end
@@ -219,6 +218,4 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     note.memos.create!(:body => "memo")
     assert_equal @user2, note.memos.new_arrivals.find_by_body("memo").operator
   end
-
-
 end

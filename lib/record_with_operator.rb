@@ -8,6 +8,24 @@ module RecordWithOperator
 
   def self.included(base)
     class << base
+      def reflections_with_operator
+        create_operator_associations
+        reflections_without_operator
+      end
+      alias_method_chain :reflections, :operator
+
+      def operator_associations_created?
+        @operator_associations_created
+      end
+
+      def create_operator_associations
+        return if operator_associations_created?
+	      belongs_to :creator, :foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('created_by')
+        belongs_to :updater, :foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('updated_by')
+        belongs_to :deleter, :foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('deleted_by')
+        @operator_associations_created = true
+      end
+
       def has_many_with_operator(*args, &extension)
         options = args.extract_options!
         # add AssociationWithOprator to :extend
@@ -57,35 +75,35 @@ module RecordWithOperator
       alias_method_chain :validate_find_options, :for
 
       private
-        # define_method association, association= ...
-        def association_accessor_methods_with_operator(reflection, association_proxy_class)
-          association_accessor_methods_without_operator(reflection, association_proxy_class)
-          define_method("#{reflection.name}_with_operator") do |*params|
-            r = send("#{reflection.name}_without_operator", *params)
-            r.operator ||= self.operator if r && r.respond_to?(:operator=)
-            r
-          end
-          alias_method_chain "#{reflection.name}".to_sym, :operator
-
-          define_method("#{reflection.name}_with_operator=") do |new_value|
-            new_value.operator ||= self.operator if new_value.respond_to?(:operator=)
-            send("#{reflection.name}_without_operator=", new_value)
-          end
-          alias_method_chain "#{reflection.name}=".to_sym, :operator
+      # define_method association, association= ...
+      def association_accessor_methods_with_operator(reflection, association_proxy_class)
+        association_accessor_methods_without_operator(reflection, association_proxy_class)
+        define_method("#{reflection.name}_with_operator") do |*params|
+          r = send("#{reflection.name}_without_operator", *params)
+          r.operator ||= self.operator if r && r.respond_to?(:operator=)
+          r
         end
-        alias_method_chain :association_accessor_methods, :operator
+        alias_method_chain "#{reflection.name}".to_sym, :operator
 
-        # define_method build_association, create_association ...
-        def association_constructor_method_with_operator(constructor, reflection, association_proxy_class)
-          association_constructor_method_without_operator(constructor, reflection, association_proxy_class)
-          define_method("#{constructor}_#{reflection.name}_with_operator") do |*params|
-            options = { :operator => self.operator }
-            params.empty? ? params[0] = options : params.first.merge!(options)
-            self.send("#{constructor}_#{reflection.name}_without_operator", *params)
-          end
-          alias_method_chain "#{constructor}_#{reflection.name}".to_sym, :operator
+        define_method("#{reflection.name}_with_operator=") do |new_value|
+          new_value.operator ||= self.operator if new_value.respond_to?(:operator=)
+          send("#{reflection.name}_without_operator=", new_value)
         end
-        alias_method_chain :association_constructor_method, :operator
+        alias_method_chain "#{reflection.name}=".to_sym, :operator
+      end
+      alias_method_chain :association_accessor_methods, :operator
+
+      # define_method build_association, create_association ...
+      def association_constructor_method_with_operator(constructor, reflection, association_proxy_class)
+        association_constructor_method_without_operator(constructor, reflection, association_proxy_class)
+        define_method("#{constructor}_#{reflection.name}_with_operator") do |*params|
+          options = { :operator => self.operator }
+          params.empty? ? params[0] = options : params.first.merge!(options)
+          self.send("#{constructor}_#{reflection.name}_without_operator", *params)
+        end
+        alias_method_chain "#{constructor}_#{reflection.name}".to_sym, :operator
+      end
+      alias_method_chain :association_constructor_method, :operator
     end
 
     base.before_create :set_created_by
@@ -115,14 +133,8 @@ module RecordWithOperator
   def method_missing(method, *args)
     return super unless respond_to?(method)
     case method.to_sym
-    when :creator
-      self.class.belongs_to :creator, :foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name]
-      send(method, *args)
-    when :updater
-      self.class.belongs_to :updater, :foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name]
-      send(method, *args)
-    when :deleter
-      self.class.belongs_to :deletor, :foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name]
+    when :creator, :updater, :deleter
+      self.class.create_operator_associations
       send(method, *args)
     else
       super
