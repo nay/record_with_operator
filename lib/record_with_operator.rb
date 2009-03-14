@@ -20,9 +20,9 @@ module RecordWithOperator
 
       def create_operator_associations
         return if operator_associations_created?
-	      belongs_to :creator, :foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('created_by')
-        belongs_to :updater, :foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('updated_by')
-        belongs_to :deleter, :foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('deleted_by')
+        belongs_to :creator, :foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name]
+        belongs_to :updater, :foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name]
+        belongs_to :deleter, :foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name]
         @operator_associations_created = true
       end
 
