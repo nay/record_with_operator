@@ -38,6 +38,7 @@ module AssociationWithOperator
       association.operator ||= @owner.operator
       association.operator ||= record.operator
     end
+    association.save
     @owner.send(@reflection.through_reflection.name).proxy_target << association
   end
 end
