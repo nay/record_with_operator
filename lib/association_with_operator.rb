@@ -21,24 +21,12 @@ module AssociationWithOperator
     results
   end
 
-  def insert_record(record, *args)
-    return super unless @reflection.kind_of?(ActiveRecord::Reflection::ThroughReflection)
-
-    if record.new_record?
-      if force
-        record.save!
-      else
-        return false unless record.save
-      end
+  def construct_join_attributes(associate)
+    join_attributes = super
+    if @owner.operator || associate.operator
+      join_attributes[:operator] ||= @owner.operator
+      join_attributes[:operator] ||= associate.operator
     end
-    through_reflection = @reflection.through_reflection
-    klass = through_reflection.klass
-    association = klass.send(:with_scope, :create => construct_join_attributes(record)) { through_reflection.build_association }
-    if association.respond_to?(:operator=)
-      association.operator ||= @owner.operator
-      association.operator ||= record.operator
-    end
-    association.save
-    @owner.send(@reflection.through_reflection.name).proxy_target << association
+    join_attributes
   end
 end
