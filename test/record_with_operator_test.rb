@@ -205,17 +205,47 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     assert note.memos.find_all_by_body("memo").all?{|m| m.operator == @user2}
   end
 
-
   def test_found_memo_through_named_scope_should_have_operator
     note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
     note.memos.create!(:body => "memo")
     assert_equal @user2, note.memos.new_arrivals.first.operator
   end
 
-
   def test_dynamically_found_memo_through_named_scope_should_have_operator
     note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
     note.memos.create!(:body => "memo")
     assert_equal @user2, note.memos.new_arrivals.find_by_body("memo").operator
+  end
+
+  def test_auto_found_memo_first_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.first
+    assert_equal nil, note.memos(true).first
+  end
+
+  def test_auto_found_memo_last_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.last
+    assert_equal nil, note.memos(true).last
+  end
+
+  def test_manualy_found_memo_first_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.find(:first)
+  end
+
+  def test_manualy_found_memo_last_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.find(:last)
+  end
+
+  def test_dynamically_found_memos_first_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.find_all_by_body("memo").first
+  end
+
+  def test_found_memo_through_named_scope_last_should_be_nil_if_note_has_no_memo
+    note = NoteWithUser.find(@note_created_by_user1.id, :for => @user2)
+    assert_equal nil, note.memos.new_arrivals.last
   end
 end

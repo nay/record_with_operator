@@ -5,7 +5,7 @@ module AssociationWithOperator
     if results.kind_of? Array
       results.each{|r| r.operator = proxy_owner.operator}
     else
-      results.operator = proxy_owner.operator
+      results.operator = proxy_owner.operator if results
     end
     results
   end
