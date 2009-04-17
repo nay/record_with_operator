@@ -58,7 +58,7 @@ module RecordWithOperator
         if operator
           if results.kind_of? Array
             results.each{|r| r.operator = operator}
-          else
+          elsif results
             results.operator = operator
           end
         end
