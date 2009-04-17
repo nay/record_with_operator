@@ -12,7 +12,7 @@ DESCRIPTION = "Rails plugin to set created_by, updated_by, deleted_by to ActiveR
 GITHUB_PROJECT = "record_with_operator"
 HOMEPAGE = "http://github.com/nay/#{GITHUB_PROJECT}/tree"
 BIN_FILES = %w( )
-VER = "0.0.12"
+VER = "0.0.13"
 CLEAN.include ['pkg']
 
 desc 'Default: run unit tests.'
@@ -55,7 +55,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('activerecord', '>=2.2.0')
   
   s.files = %w(README.rdoc Rakefile MIT-LICENSE) +
-    %w(install.rb uninstall.rb init.rb) +
+    %w(install.rb uninstall.rb) +
     Dir.glob("{bin,doc,lib,tasks,rails}/**/*")
 
 end

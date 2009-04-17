@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{record_with_operator}
-  s.version = "0.0.12"
+  s.version = "0.0.13"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yasuko Ohba"]
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = %q{Rails plugin to set created_by, updated_by, deleted_by to ActiveRecord objects. Supports associations.}
   s.email = %q{y.ohba@everyleaf.com}
   s.extra_rdoc_files = ["README.rdoc", "MIT-LICENSE"]
-  s.files = ["README.rdoc", "Rakefile", "MIT-LICENSE", "install.rb", "uninstall.rb", "init.rb", "lib/association_with_operator.rb", "lib/record_with_operator.rb", "lib/record_with_operator.rb~", "tasks/record_with_operator_tasks.rake", "rails/init.rb", "test/record_with_operator_belongs_to_association_test.rb", "test/record_with_operator_has_one_association_test.rb", "test/record_with_operator_reflection_test.rb", "test/record_with_operator_test.rb", "test/record_with_operator_user_class_name_test.rb", "test/schema.rb", "test/test_helper.rb", "test/database.yml"]
+  s.files = ["README.rdoc", "Rakefile", "MIT-LICENSE", "install.rb", "uninstall.rb", "lib/association_with_operator.rb", "lib/record_with_operator.rb", "lib/record_with_operator.rb~", "tasks/record_with_operator_tasks.rake", "rails/init.rb", "test/record_with_operator_belongs_to_association_test.rb", "test/record_with_operator_has_one_association_test.rb", "test/record_with_operator_reflection_test.rb", "test/record_with_operator_test.rb", "test/record_with_operator_user_class_name_test.rb", "test/schema.rb", "test/test_helper.rb", "test/database.yml"]
   s.has_rdoc = true
   s.homepage = %q{http://github.com/nay/record_with_operator/tree}
   s.rdoc_options = ["--line-numbers", "--inline-source"]
