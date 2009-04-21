@@ -155,9 +155,9 @@ module RecordWithOperator
   end
 
   def set_deleted_by
-    return unless respond_to?(:deleted_by=) && operator
+    return unless self.class.column_names.include?("deleted_by") && operator
+    self.class.update_all("deleted_by = #{operator.id}", ["#{self.class.primary_key} = ?", id])
     self.deleted_by = operator.id
-    save!
   end
 
 end
