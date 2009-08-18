@@ -1,6 +1,6 @@
 module RecordWithOperator
   def self.config
-    @config ||= {:user_class_name => "User", :operator_assoication_options => {}}
+    @config ||= {:user_class_name => "User", :operator_association_options => {}}
     @config
   end
 
