@@ -1,6 +1,6 @@
 module RecordWithOperator
   def self.config
-    @config ||= {:user_class_name => "User"}
+    @config ||= {:user_class_name => "User", :operator_assoication_options => {}}
     @config
   end
 
@@ -23,9 +23,9 @@ module RecordWithOperator
         @operator_associations_created = true
 
         if self.table_exists?
-          belongs_to :creator, :foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('created_by')
-          belongs_to :updater, :foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('updated_by')
-          belongs_to :deleter, :foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name] if column_names.include?('deleted_by')
+          belongs_to :creator, {:foreign_key => "created_by", :class_name => RecordWithOperator.config[:user_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if column_names.include?('created_by')
+          belongs_to :updater, {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:user_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if column_names.include?('updated_by')
+          belongs_to :deleter, {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:user_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if column_names.include?('deleted_by')
         end
       end
 
