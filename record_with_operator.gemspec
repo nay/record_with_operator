@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{record_with_operator}
-  s.version = "0.0.19"
+  s.version = "0.0.20"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Yasuko Ohba"]
-  s.date = %q{2009-08-18}
+  s.date = %q{2009-09-25}
   s.description = %q{Rails plugin to set created_by, updated_by, deleted_by to ActiveRecord objects. Supports associations.}
   s.email = %q{y.ohba@everyleaf.com}
   s.extra_rdoc_files = ["README.rdoc", "MIT-LICENSE"]
