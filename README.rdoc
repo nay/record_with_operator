@@ -15,21 +15,7 @@ This plugin assumes that the logical deletion is kicked by record.destory.
 
 == Installation
 
-  gem install nay-record_with_operator --source http://gems.github.com
-
-Or, you can install it in vender/plugins.
-
   > ./script/plugin install git://github.com/nay/record_with_operator.git
-
-
-== Rails Configration
-
-In config/environment.rb:
-
-  Rails::Initializer.run do |config|
-    config.gem 'nay-record_with_operator', :lib => 'record_with_operator',
-      :source => 'http://gems.github.com'
-  end
 
 == Example
 
@@ -66,4 +52,4 @@ the configuration will be look like this.
 
   RecordWithOperator.config[:operator_association_options] = {:with_deleted => true}
 
-Copyright (c) 2009 Yasuko Ohba, released under the MIT license
+Copyright (c) 2009-2010 Yasuko Ohba, released under the MIT license
