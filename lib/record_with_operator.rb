@@ -156,6 +156,7 @@ module RecordWithOperator
 
   def set_deleted_by
     return unless self.class.column_names.include?("deleted_by") && operator
+    return if frozen?
     self.class.update_all("deleted_by = #{operator.id}", ["#{self.class.primary_key} = ?", id])
     self.deleted_by = operator.id
   end
