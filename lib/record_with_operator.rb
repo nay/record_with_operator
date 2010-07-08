@@ -150,7 +150,7 @@ module RecordWithOperator
   end
 
   def set_updated_by
-    return unless respond_to?(:updated_by=) && operator
+    return unless respond_to?(:updated_by=) && operator && changed? # no use setting updating_by when it's not changed
     self.updated_by = operator.id
   end
 
