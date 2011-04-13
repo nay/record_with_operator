@@ -21,14 +21,14 @@ This plugin assumes that the logical deletion is kicked by record.destory.
 == Example
 
 Create Note table with nessisary attributes:
-    class CreateNotes < ActiveRecord::Migration
-      def self.up
-        create_table :users do |t|
-          t.string :body
-          t.operator_stamps  #creates attributes for created_by, updated_by, deleted_by
-          t.timestamps
-        end
-      end
+class CreateNotes < ActiveRecord::Migration
+  def self.up
+    create_table :users do |t|
+      t.string :body
+      t.operator_stamps  #creates attributes for created_by, updated_by, deleted_by
+      t.timestamps
+    end
+  end
 
 
 Create a new note object with current_user:
