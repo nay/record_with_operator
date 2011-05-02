@@ -5,7 +5,8 @@
 RecordWithOperator is a rails plugin that makes your all active record models to be saved or logically deleted with created_by, updated_by, deleted_by automatically.
 Also it makes creator, updater, deleter association (belongs_to) if the class has created_by, updated_by, deleted_by.
 
-You need to set 'operator' (it may be an User object) to your model object at first.
+You need to set 'operator' (it may be an User object) to the instance of the model you are trying to create/save/update/delete.
+(This cannot happen automatically as the current_user is stored in the session which models cannot access.)
 Once you have set an operator, it will be copied to objects in the association collection, so it might be enough to set an operator per request.
 Operators are also useful for your access control features on model's side.
 To set an operator, simply use operator= or get objects by find method with :for option.
@@ -15,9 +16,20 @@ This plugin assumes that the logical deletion is kicked by record.destory.
 
 == Installation
 
-  > ./script/plugin install git://github.com/nay/record_with_operator.git
+  > ./script/plugin install git://github.com/bbuchalter/record_with_operator.git
 
 == Example
+
+Create Note table with nessisary attributes:
+class CreateNotes < ActiveRecord::Migration
+  def self.up
+    create_table :users do |t|
+      t.string :body
+      t.operator_stamps  #creates attributes for created_by, updated_by, deleted_by
+      t.timestamps
+    end
+  end
+
 
 Create a new note object with current_user:
 

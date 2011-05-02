@@ -1,4 +1,6 @@
 module RecordWithOperator
+  require 'helpers/migration_helper.rb'
+  
   def self.config
     @config ||= {:user_class_name => "User", :operator_association_options => {}}
     @config
@@ -67,15 +69,16 @@ module RecordWithOperator
 
       alias_method_chain :find, :for
 
-      def validate_find_options_with_for(options)
-        if options
-          options = options.dup
-          options.delete(:for)
-        end
-        validate_find_options_without_for(options)
-      end
-
-      alias_method_chain :validate_find_options, :for
+#       No longer valid in Rails 3
+#      def validate_find_options_with_for(options)
+#        if options
+#          options = options.dup
+#          options.delete(:for)
+#        end
+#        validate_find_options_without_for(options)
+#      end
+#
+#      alias_method :validate_find_options, :validate_find_options_with_for
 
       private
       # define_method association, association= ...
