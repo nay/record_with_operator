@@ -17,5 +17,13 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.extra_rdoc_files = ['README.rdoc']
   s.require_paths = ["lib"]
+
+  s.licenses = ["MIT"]
+
+  s.add_dependency 'activerecord', ['>= 3.0.0']
+  s.add_development_dependency 'bundler', ['>= 1.0.0']
+  s.add_development_dependency 'rake', ['>= 0.8.7']
+  s.add_development_dependency 'sqlite3', ['>= 0']
 end

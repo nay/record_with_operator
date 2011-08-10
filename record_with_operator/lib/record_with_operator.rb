@@ -1,3 +1,0 @@
-module RecordWithOperator
-  # Your code goes here...
-end

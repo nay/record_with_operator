@@ -3,7 +3,7 @@
 #  :dbfile: record_with_operator_plugin.sqlite.db
 sqlite3:
   :adapter: sqlite3
-  :dbfile: record_with_operator_plugin.sqlite3.db
+  :database: ':memory:'
 #postgresql:
 #  :adapter: postgresql
 #  :username: postgres
