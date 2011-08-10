@@ -7,8 +7,10 @@ class NoteWithUserWithDependency < ActiveRecord::Base
   set_table_name "notes"
   has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id", :dependent => :destroy
 
-  protected
-  def before_destroy
+  before_destroy :check_operator
+
+  private
+  def check_operator
     raise "can't destroy without operator" unless operator
   end
 end
@@ -16,8 +18,10 @@ end
 class MemoWithUserWithDependency < ActiveRecord::Base
   set_table_name "memos"
 
-  protected
-  def before_destroy
+  before_destroy :check_operator
+
+  private
+  def check_operator
     raise "can't destroy without operator" unless operator
   end
 end

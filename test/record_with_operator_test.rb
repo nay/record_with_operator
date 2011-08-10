@@ -7,27 +7,21 @@ class NoteWithUser < ActiveRecord::Base
   set_table_name "notes"
   has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id"
 
-  named_scope :new_arrivals, {:order => "updated_at desc"}
+  scope :new_arrivals, {:order => "updated_at desc"}
 
-  def destroy_without_callbacks
-    unless new_record?
-      self.class.update_all self.class.send(:sanitize_sql, ["deleted_at = ?", (self.deleted_at = default_timezone == :utc ? Time.now.utc : Time.now)]), ["#{self.class.primary_key} = ?", id]
+  alias_method :destroy!, :destroy
+
+  def destroy
+    with_transaction_returning_status do
+      _run_destroy_callbacks do
+        self.class.update_all({:deleted_at => Time.now}, {self.class.primary_key => self.id})
+      end
     end
     freeze
   end
 
-  def destroy_with_callbacks!
-    return false if callback(:before_destroy) == false
-    result = destroy_without_callbacks!
-    callback(:after_destroy)
-    result
-  end
-  def destroy!
-    transaction { destroy_with_callbacks! }
-  end
-
   def deleted?
-    self.deleted_at.to_time <= Time.now
+    !self.deleted_at.nil?
   end
 end
 
@@ -38,7 +32,7 @@ end
 class MemoWithUser < ActiveRecord::Base
   set_table_name "memos"
 
-  named_scope :new_arrivals, {:order => "updated_at desc"}
+  scope :new_arrivals, {:order => "updated_at desc"}
 end
 
 class UpdaterNoteWithUser < ActiveRecord::Base
