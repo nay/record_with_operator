@@ -1,37 +1,24 @@
-module AssociationWithOperator
+require 'record_with_operator/utility'
+
+module RecordWithOperator
   module Associations
     module Extension
-      def find(*args)
-        results = super
-        if results.kind_of? Array
-          results.each{|r| r.operator = proxy_owner.operator}
-        else
-          results.operator = proxy_owner.operator if results
-        end
-        results
-      end
+      include RecordWithOperator::Utility
 
+      def find(*args)
+        set_operator_to_records(super, @owner.operator)
+      end
 
       def method_missing(method, *args)
-        results = super
-        unless ActiveRecord::Relation === results
-          if results.respond_to?(:operator=)
-            results.operator= proxy_owner.operator
-          elsif results.kind_of? Array
-            results.each{|r| r.operator = proxy_owner.operator if r.respond_to?(:operator=)}
-          end
-        end
-        results
+        set_operator_to_records(super, @owner.operator)
       end
 
-      def construct_join_attributes(associate)
-        join_attributes = super
-        if @owner.operator || associate.operator
-          join_attributes[:operator] ||= @owner.operator
-          join_attributes[:operator] ||= associate.operator
+      protected
+        def construct_scope
+          scoping = super
+          scoping[:find][:for] = @owner.operator
+          scoping
         end
-        join_attributes
-      end
     end
   end
 end

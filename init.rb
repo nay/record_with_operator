@@ -1,1 +1,1 @@
-require 'lib/record_with_operator'
+require 'record_with_operator'

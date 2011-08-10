@@ -37,9 +37,9 @@ module RecordWithOperator
           # add AssociationWithOprator to :extend
           if options[:extend]
             options[:extend] = [options[:extend]] unless options[:extend].kind_of? Array
-            options[:extend] << AssociationWithOperator::Associations::Extension
+            options[:extend] << RecordWithOperator::Associations::Extension
           else
-            options[:extend] = AssociationWithOperator::Associations::Extension
+            options[:extend] = RecordWithOperator::Associations::Extension
           end
           # add :set_operator to :before_add
           if options[:before_add]
@@ -52,34 +52,6 @@ module RecordWithOperator
           has_many_without_operator(*args, &extension)
         end
         alias_method_chain :has_many, :operator
-
-        def find_with_for(*args)
-          options = args.extract_options!
-          operator = options.delete(:for)
-          args << options
-          results = find_without_for(*args)
-          if operator
-            if results.kind_of? Array
-              results.each{|r| r.operator = operator}
-            elsif results
-              results.operator = operator
-            end
-          end
-          results
-        end
-
-        alias_method_chain :find, :for
-
-  #       No longer valid in Rails 3
-  #      def validate_find_options_with_for(options)
-  #        if options
-  #          options = options.dup
-  #          options.delete(:for)
-  #        end
-  #        validate_find_options_without_for(options)
-  #      end
-  #
-  #      alias_method :validate_find_options, :validate_find_options_with_for
 
         private
         # define_method association, association= ...
