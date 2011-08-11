@@ -16,7 +16,12 @@ This plugin assumes that the logical deletion is kicked by record.destory.
 
 == Installation
 
-  > ./script/plugin install git://github.com/bbuchalter/record_with_operator.git
+  > ./script/plugin install git://github.com/nay/record_with_operator.git
+
+Or
+
+  ## Gemfile for Rails3
+  gem 'record_with_operator'
 
 == Example
 

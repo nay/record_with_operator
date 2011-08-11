@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: ruby; coding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
 require "record_with_operator/version"
 
@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Yasuko Ohba"]
   s.email       = ["y.ohba@everyleaf.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/nay/record_with_operator"
   s.summary     = %q{Rails plugin to set created_by, updated_by, deleted_by to ActiveRecord objects. Supports associations.}
-  s.description = %q{Rails plugin to set created_by, updated_by, deleted_by to ActiveRecord objects. Supports associations.}
+  s.description = %q{RecordWithOperator is a rails plugin that makes your all active record models to be saved or logically deleted with created_by, updated_by, deleted_by automatically. Also it makes creator, updater, deleter association (belongs_to) if the class has created_by, updated_by, deleted_by.}
 
   s.rubyforge_project = "record_with_operator"
 
