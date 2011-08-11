@@ -1,1 +1,1 @@
-ActiveRecord::Base.instance_eval{include RecordWithOperator} unless ActiveRecord::Base.include?(RecordWithOperator)
+require 'record_with_operator'
