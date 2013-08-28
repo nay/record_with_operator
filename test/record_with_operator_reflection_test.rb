@@ -5,15 +5,19 @@ end
 
 class NoteForReflectionTest < ActiveRecord::Base
   set_table_name "notes"
+
+  records_with_operator_on :create, :update, :destroy
 end
 
 class CreatorNoteForReflectionTest < ActiveRecord::Base
   set_table_name "creator_notes"
+
+  records_with_operator_on :create
 end
 
 class RecordWithOperatorReflectionTest < ActiveSupport::TestCase
   def setup
-    RecordWithOperator.config[:user_class_name] = "User"
+    RecordWithOperator.config[:operator_class_name] = "User"
     @user1 = User.create!(:name => "user1")
     raise "@user1.id is nil" unless @user1.id
     @note = NoteForReflectionTest.create!(:body => "test", :operator => @user1)

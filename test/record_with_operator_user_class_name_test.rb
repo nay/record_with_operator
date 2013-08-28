@@ -1,8 +1,12 @@
 
 require 'test_helper'
 
+RecordWithOperator.config[:operator_class_name] = "AdminUser"
+
 class NoteWithAdminUser < ActiveRecord::Base
   set_table_name "notes"
+
+  records_with_operator_on :create, :update, :destroy
 
   def destroy_with_deleted_at
     NoteWithAdminUser.update_all("deleted_at = '#{Time.now.to_s(:db)}'", "id = #{self.id}")
@@ -23,7 +27,6 @@ end
 
 class RecordWithOperatorUserClassNameTest < ActiveSupport::TestCase
   def setup
-    RecordWithOperator.config[:user_class_name] = "AdminUser"
     @user1 = AdminUser.create!(:name => "user1")
     @user2 = AdminUser.create!(:name => "user2")
     @note_created_by_user1 = NoteWithAdminUser.create!(:body => "test", :operator => @user1)
@@ -43,12 +46,14 @@ class RecordWithOperatorUserClassNameTest < ActiveSupport::TestCase
   end
 
   def test_note_should_be_found_with_for
-    note = NoteWithAdminUser.find(@note_created_by_user1.id, :for => @user2)
+    RecordWithOperator.operator = @user2
+    note = NoteWithAdminUser.find(@note_created_by_user1.id)
     assert_equal(@user2, note.operator)
   end
 
   def test_note_should_be_updated_with_updated_by
-    note = NoteWithAdminUser.find(@note_created_by_user1.id, :for => @user2)
+    RecordWithOperator.operator = @user2
+    note = NoteWithAdminUser.find(@note_created_by_user1.id)
     note.body = "changed"
     note.save!
     assert_equal(@user2.id, note.updated_by)

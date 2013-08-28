@@ -5,7 +5,7 @@ end
 
 class NoteWithUserWithDependency < ActiveRecord::Base
   set_table_name "notes"
-  has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id", :dependent => :destroy
+  has_many :memos, :class_name => "MemoWithUserWithDependency", :foreign_key => "note_id", :dependent => :destroy
 
   before_destroy :check_operator
 
@@ -29,7 +29,7 @@ end
 
 class RecordWithOperatorHasManyDependentTest < ActiveSupport::TestCase
   def setup
-    RecordWithOperator.config[:user_class_name] = "User"
+    RecordWithOperator.config[:operator_class_name] = "User"
     @user1 = User.create!(:name => "user1")
     raise "@user1.id is nil" unless @user1.id
     @user2 = User.create!(:name => "user2")

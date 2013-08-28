@@ -2,66 +2,96 @@
 
 == Introduction
 
-RecordWithOperator is a rails plugin that makes your all active record models to be saved or logically deleted with created_by, updated_by, deleted_by automatically.
-Also it makes creator, updater, deleter association (belongs_to) if the class has created_by, updated_by, deleted_by.
+RecordWithOperator is a gem that makes your active record models to be saved or logically deleted with created_by, updated_by, deleted_by (column names can be changed).
+Also it makes creator, updater, deleter association (belongs_to).
 
-You need to set 'operator' (it may be an User object) to the instance of the model you are trying to create/save/update/delete.
-(This cannot happen automatically as the current_user is stored in the session which models cannot access.)
-Once you have set an operator, it will be copied to objects in the association collection, so it might be enough to set an operator per request.
-Operators are also useful for your access control features on model's side.
-To set an operator, simply use operator= or get objects by find method with :for option.
+You can specify which action you want to save operator like this.
+
+  records_with_oprator_on :cerate, :update, destroy
+
+RecordWithOperator needs to know who is currently operating.
+For that, you need to set operator through one of the following ways.
+
+  # Every ActiveRecord object has operator= and operator.
+  record.operator = current_user
+  record.save
+
+  # RecordWithOperator module has operator= and operator.
+  RecordWithOperator.operator = current_user
+  obj = YourModel.find(id)
+  obj.attributes = some_params
+  obj.save
+
+In rails application, a nice place for setting operator whould be in filters.
+
+Operators whould be also useful for your access control features on model's side.
 
 The logical deletion function itself is out of this plugin's scope.
 This plugin assumes that the logical deletion is kicked by record.destory.
 
+== API Changes
+
+:for option in find method has been removed.
+(It's no use since operator is now global.)
+Please set operator before search if you need operator at that timing.
+
+Also, operator_stamps is removed.
+
 == Installation
 
-  > ./script/plugin install git://github.com/nay/record_with_operator.git
-
-Or
-
-  ## Gemfile for Rails3
+  ## Gemfile
   gem 'record_with_operator'
 
 == Example
 
 Create Note table with nessisary attributes:
 class CreateNotes < ActiveRecord::Migration
-  def self.up
+  def change
     create_table :users do |t|
       t.string :body
-      t.operator_stamps  #creates attributes for created_by, updated_by, deleted_by
+      t.integer :created_by
+      t.integer :updated_by
+      t.integer :deleted_by
+
+      t.boolean :deleted
+
       t.timestamps
     end
   end
 
+Set an operator in some filter
 
-Create a new note object with current_user:
+  def set_operator
+    RecordWithOperator.operator = current_user
+  end
 
- note = Note.create(:body => "This is my first note.", :operator => current_user)
+Create a new note object:
+
+ note = Note.create(:body => "This is my first note.")
  # note.operator will be current_user
  # note.created_by will be current_user.id
 
-Get note objects with current_user:
+Get note objects:
 
- notes = Note.find(:all, :for => current_user)
+ notes = Note.all
  # notes.first.operator will be current_user
- # notes.find_by_body("This is my first note.").operator will be current_user
 
 Create note's comments:
 
- note = Note.find(params[:id], :for => current_user)
+ note = Note.find(params[:id])
  note.comments.create!(:body => params[:comment_body])
- # comment's operator will be automatically set and used as created_by
+ # comment.operator will be current_user
+ # comment.created_by will be current_user.id
 
 == Configuration
 
-You can change the operator's class name by setting RecordWithOperator.config[:user_class_name].
+You can change the operator's class name by setting RecordWithOperator.config[:operator_class_name]. (It was renamed from :user_class_name. )
 The default is 'User'.
-Note that it is required to change the value before the model's creator/updater/deleter is firstly called.
+
+Note that it is required to change this value before your model classes are loaded.
 For example, you can write the code under config/initializers.
 
-  RecordWithOperator.config[:user_class_name] = "AdminUser"
+  RecordWithOperator.config[:operator_class_name] = "AdminUser"
 
 It's also possible to modify options for creator/updater/deleter associations.
 For example, in the case you use acts_as_paranoid and want to get creator/updater/deleter even if they are deleted,
@@ -69,4 +99,8 @@ the configuration will be look like this.
 
   RecordWithOperator.config[:operator_association_options] = {:with_deleted => true}
 
-Copyright (c) 2009-2010 Yasuko Ohba, released under the MIT license
+You can cange created_by, updated_by, deleted_by column name by changing RecordWithOperator.config with keys :creator_column, :updater_column and :deleter_column.
+
+The association names (such as creator, updater and deleter) can not be changed in this version.
+
+Copyright (c) 2009-2013 Yasuko Ohba, released under the MIT license
