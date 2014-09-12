@@ -43,15 +43,15 @@ module RecordWithOperator
       end
 
       def records_creator?
-        @records_on.include?("create")
+        @records_on && @records_on.include?("create")
       end
 
       def records_updater?
-        @records_on.include?("update")
+        @records_on && @records_on.include?("update")
       end
 
       def records_deleter?
-        @records_on.include?("destroy")
+        @records_on && @records_on.include?("destroy")
       end
     end
   end

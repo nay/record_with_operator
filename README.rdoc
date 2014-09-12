@@ -7,7 +7,7 @@ Also it makes creator, updater, deleter association (belongs_to).
 
 You can specify which action you want to save operator like this.
 
-  records_with_oprator_on :cerate, :update, destroy
+  records_with_operator_on :cerate, :update, :destroy
 
 RecordWithOperator needs to know who is currently operating.
 For that, you need to set operator through one of the following ways.
