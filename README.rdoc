@@ -44,7 +44,7 @@ Also, operator_stamps is removed.
 
 == Example
 
-Create Note table with nessisary attributes:
+Create Note table with necessary attributes:
 class CreateNotes < ActiveRecord::Migration
   def change
     create_table :users do |t|
