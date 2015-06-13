@@ -5,7 +5,8 @@ module RecordWithOperator
       :creator_column => "created_by",
       :updater_column => "updated_by",
       :deleter_column => "deleted_by",
-      :operator_association_options => {}}
+      :operator_association_options => {},
+      :operator_association_scope => nil}
     @config
   end
 

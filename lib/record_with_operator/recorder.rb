@@ -38,9 +38,9 @@ module RecordWithOperator
         before_destroy :update_deleter if records_deleter?
 
         if self.table_exists?
-          belongs_to :creator, {:foreign_key => "created_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_creator?
-          belongs_to :updater, {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_updater?
-          belongs_to :deleter, {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
+          belongs_to :creator, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "created_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_creator?
+          belongs_to :updater, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_updater?
+          belongs_to :deleter, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
         end
       end
 
