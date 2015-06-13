@@ -1,7 +1,7 @@
 $:.push File.expand_path('../../', __FILE__)
 
 require 'logger'
-require 'test/unit'
+require 'minitest/autorun'
 require 'active_record'
 require 'active_support'
 require 'active_support/test_case'
