@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
 end
 
 class NoteWithUserWithDependency < ActiveRecord::Base
-  set_table_name "notes"
+  self.table_name = "notes"
   has_many :memos, :class_name => "MemoWithUserWithDependency", :foreign_key => "note_id", :dependent => :destroy
 
   before_destroy :check_operator
@@ -16,7 +16,7 @@ class NoteWithUserWithDependency < ActiveRecord::Base
 end
 
 class MemoWithUserWithDependency < ActiveRecord::Base
-  set_table_name "memos"
+  self.table_name = "memos"
 
   before_destroy :check_operator
 
@@ -42,8 +42,8 @@ class RecordWithOperatorHasManyDependentTest < ActiveSupport::TestCase
 
   def test_memos_should_be_destroyed_when_note_is_destroyed
     @note_created_by_user1.destroy
-    assert_nil NoteWithUserWithDependency.find_by_id(@note_created_by_user1.id)
-    assert MemoWithUserWithDependency.find_all_by_note_id(@note_created_by_user1.id).empty?
+    assert_nil NoteWithUserWithDependency.find_by(:id => @note_created_by_user1.id)
+    assert MemoWithUserWithDependency.where(:note_id => @note_created_by_user1.id).empty?
   end
 
 end

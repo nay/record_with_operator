@@ -4,13 +4,13 @@ class User < ActiveRecord::Base
 end
 
 class NoteForReflectionTest < ActiveRecord::Base
-  set_table_name "notes"
+  self.table_name = "notes"
 
   records_with_operator_on :create, :update, :destroy
 end
 
 class CreatorNoteForReflectionTest < ActiveRecord::Base
-  set_table_name "creator_notes"
+  self.table_name = "creator_notes"
 
   records_with_operator_on :create
 end
@@ -26,18 +26,18 @@ class RecordWithOperatorReflectionTest < ActiveSupport::TestCase
   end
 
   def test_include
-    assert NoteForReflectionTest.find(:all, :include => [:creator, :updater])
+    assert NoteForReflectionTest.includes(:creator, :updater).all.to_a
   end
 
   def test_joins
-    assert NoteForReflectionTest.find(:all, :joins => [:creator, :updater])
+    assert NoteForReflectionTest.joins(:creator, :updater).all.to_a
   end
 
   def test_include_missing_association
-    assert_raise(ActiveRecord::ConfigurationError) { CreatorNoteForReflectionTest.find(:all, :include => [:updater]) }
+    assert_raise(ActiveRecord::ConfigurationError) { CreatorNoteForReflectionTest.includes(:updater).all.to_a }
   end
 
   def test_joins_missing_association
-    assert_raise(ActiveRecord::ConfigurationError) { CreatorNoteForReflectionTest.find(:all, :joins => [:updater]) }
+    assert_raise(ActiveRecord::ConfigurationError) { CreatorNoteForReflectionTest.joins(:updater).all.to_a }
   end
 end

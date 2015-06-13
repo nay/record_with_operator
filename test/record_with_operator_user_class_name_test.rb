@@ -4,7 +4,7 @@ require 'test_helper'
 RecordWithOperator.config[:operator_class_name] = "AdminUser"
 
 class NoteWithAdminUser < ActiveRecord::Base
-  set_table_name "notes"
+  self.table_name = "notes"
 
   records_with_operator_on :create, :update, :destroy
 
@@ -22,7 +22,7 @@ class NoteWithAdminUser < ActiveRecord::Base
 end
 
 class AdminUser < ActiveRecord::Base
-  set_table_name "users"
+  self.table_name = "users"
 end
 
 class RecordWithOperatorUserClassNameTest < ActiveSupport::TestCase

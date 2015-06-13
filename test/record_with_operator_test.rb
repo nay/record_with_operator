@@ -4,10 +4,10 @@ class User < ActiveRecord::Base
 end
 
 class NoteWithUser < ActiveRecord::Base
-  set_table_name "notes"
+  self.table_name = "notes"
   has_many :memos, :class_name => "MemoWithUser", :foreign_key => "note_id"
 
-  scope :new_arrivals, {:order => "updated_at desc"}
+  scope :new_arrivals, -> { order("updated_at" => "desc") }
 
   alias_method :destroy!, :destroy
 
@@ -16,7 +16,7 @@ class NoteWithUser < ActiveRecord::Base
   def destroy
     with_transaction_returning_status do
       _run_destroy_callbacks do
-        self.class.update_all({:deleted_at => Time.now}, {self.class.primary_key => self.id})
+        self.class.where(self.class.primary_key => self.id).update_all(:deleted_at => Time.now)
       end
     end
     freeze
@@ -28,25 +28,25 @@ class NoteWithUser < ActiveRecord::Base
 end
 
 class SimpleNoteWithUser < ActiveRecord::Base
-  set_table_name "simple_notes"
+  self.table_name = "simple_notes"
 end
 
 class MemoWithUser < ActiveRecord::Base
-  set_table_name "memos"
+  self.table_name = "memos"
 
-  scope :new_arrivals, {:order => "updated_at desc"}
+  scope :new_arrivals, -> { order("updated_at" => "desc") }
 
   records_with_operator_on :create, :update, :destroy
 end
 
 class UpdaterNoteWithUser < ActiveRecord::Base
-  set_table_name "updater_notes"
+  self.table_name = "updater_notes"
 
   records_with_operator_on :update
 end
 
 class DeleterNoteWithUser < ActiveRecord::Base
-  set_table_name "deleter_notes"
+  self.table_name = "deleter_notes"
 
   records_with_operator_on :destroy
 
@@ -199,21 +199,21 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
     note.memos.create!(:body => "memo")
-    assert_equal @user2, note.memos.find(:first).operator
+    assert_equal @user2, note.memos.first.operator
   end
 
   def test_dynamically_found_memo_should_have_operator
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
     note.memos.create!(:body => "memo")
-    assert_equal @user2, note.memos.find_by_body("memo").operator
+    assert_equal @user2, note.memos.find_by(:body => "memo").operator
   end
 
   def test_dynamically_found_memos_should_have_operator
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
     note.memos.create!(:body => "memo")
-    assert note.memos.find_all_by_body("memo").all?{|m| m.operator == @user2}
+    assert note.memos.where(:body => "memo").all?{|m| m.operator == @user2}
   end
 
   def test_found_memo_through_named_scope_should_have_operator
@@ -227,7 +227,7 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
     note.memos.create!(:body => "memo")
-    assert_equal @user2, note.memos.new_arrivals.find_by_body("memo").operator
+    assert_equal @user2, note.memos.new_arrivals.find_by(:body => "memo").operator
   end
 
   def test_auto_found_memo_first_should_be_nil_if_note_has_no_memo
@@ -247,19 +247,19 @@ class RecordWithOperatorTest < ActiveSupport::TestCase
   def test_manualy_found_memo_first_should_be_nil_if_note_has_no_memo
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
-    assert_equal nil, note.memos.find(:first)
+    assert_equal nil, note.memos.first
   end
 
   def test_manualy_found_memo_last_should_be_nil_if_note_has_no_memo
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
-    assert_equal nil, note.memos.find(:last)
+    assert_equal nil, note.memos.last
   end
 
   def test_dynamically_found_memos_first_should_be_nil_if_note_has_no_memo
     RecordWithOperator.operator = @user2
     note = NoteWithUser.find(@note_created_by_user1.id)
-    assert_equal nil, note.memos.find_all_by_body("memo").first
+    assert_equal nil, note.memos.where(:body => "memo").first
   end
 
   def test_found_memo_through_named_scope_last_should_be_nil_if_note_has_no_memo
