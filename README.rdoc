@@ -97,7 +97,7 @@ It's also possible to modify options for creator/updater/deleter associations.
 For example, in the case you use acts_as_paranoid and want to get creator/updater/deleter even if they are deleted,
 the configuration will be look like this.
 
-  RecordWithOperator.config[:operator_association_options] = {:with_deleted => true}
+  RecordWithOperator.config[:operator_association_scope] = -> { with_deleted }
 
 You can cange created_by, updated_by, deleted_by column name by changing RecordWithOperator.config with keys :creator_column, :updater_column and :deleter_column.
 

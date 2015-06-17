@@ -7,7 +7,7 @@ module RecordWithOperator
     private
 
     def set_creator
-      send("#{RecordWithOperator.creator_column}=", operator.try(:id))
+      send("#{RecordWithOperator.creator_column}=", operator.try!(:id))
     end
 
     def set_updater
@@ -19,7 +19,9 @@ module RecordWithOperator
     def update_deleter
       return if frozen?
       return unless operator
-      self.class.update_all("#{RecordWithOperator.deleter_column} = #{operator.id}", ["#{self.class.primary_key} = ?", id])
+      self.class
+        .where(self.class.primary_key => id)
+        .update_all(RecordWithOperator.deleter_column => operator.id)
       send("#{RecordWithOperator.deleter_column}=", operator.id)
     end
 
@@ -36,9 +38,9 @@ module RecordWithOperator
         before_destroy :update_deleter if records_deleter?
 
         if self.table_exists?
-          belongs_to :creator, {:foreign_key => "created_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_creator?
-          belongs_to :updater, {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_updater?
-          belongs_to :deleter, {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
+          belongs_to :creator, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "created_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_creator?
+          belongs_to :updater, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "updated_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_updater?
+          belongs_to :deleter, RecordWithOperator.config[:operator_association_scope], {:foreign_key => "deleted_by", :class_name => RecordWithOperator.config[:operator_class_name]}.merge(RecordWithOperator.config[:operator_association_options]) if records_deleter?
         end
       end
 

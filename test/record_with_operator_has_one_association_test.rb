@@ -4,14 +4,14 @@ class User < ActiveRecord::Base
 end
 
 class NoteHasOneMemo < ActiveRecord::Base
-  set_table_name "notes"
+  self.table_name = "notes"
   has_one :memo, :class_name => "Memo", :foreign_key => "note_id"
 
   records_with_operator_on :create, :update, :destroy
 end
 
 class Memo < ActiveRecord::Base
-  set_table_name "memos"
+  self.table_name = "memos"
 
   records_with_operator_on :create, :update, :destroy
 end
