@@ -11,5 +11,6 @@ require 'lib/record_with_operator'
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
 ActiveRecord::Base.establish_connection(config['sqlite3'])
+ActiveSupport::TestCase.test_order = :random
 
 load(File.dirname(__FILE__) + "/schema.rb")
