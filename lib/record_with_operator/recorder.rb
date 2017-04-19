@@ -19,7 +19,7 @@ module RecordWithOperator
     def update_deleter
       return if frozen?
       return unless operator
-      self.class.update_all("#{RecordWithOperator.deleter_column} = #{operator.id}", ["#{self.class.primary_key} = ?", id])
+      self.class.update_all("#{RecordWithOperator.deleter_column} = #{operator.id}")
       send("#{RecordWithOperator.deleter_column}=", operator.id)
     end
 
